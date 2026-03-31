@@ -70,3 +70,22 @@ export const signalCards = [
   'Retrieval systems for domain knowledge',
   'Executive-grade automation governance',
 ];
+
+export const values = [
+  {
+    title: 'Purpose-Driven Systems',
+    description: "Technology must solve actual problems, not introduce new complexity. We avoid selling bloated platforms and instead focus on deeply understanding how your business operates."
+  },
+  {
+    title: 'Adaptable AI',
+    description: "AI should mold to your business, not the reverse. Your industry knowledge is the true asset—our systems just make your teams faster, sharper, and highly scalable."
+  },
+  {
+    title: 'Collaborative Builds',
+    description: "The best software isn't handed down from a boardroom. It's built alongside the operators who rely on it daily. We design our solutions with the teams actually using them."
+  },
+  {
+    title: 'Rapid Validation',
+    description: "We believe in proving value fast. No endless discovery phases or bloated documents. We build real prototypes, measure immediate outcomes, and scale what works."
+  }
+];

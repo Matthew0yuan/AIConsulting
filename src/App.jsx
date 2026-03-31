@@ -1,5 +1,6 @@
 import Header from './components/Header';
 import Hero from './components/Hero';
+import AboutUs from './components/AboutUs';
 import Capabilities from './components/Capabilities';
 import DemoCases from './components/DemoCases';
 import ProcessTimeline from './components/ProcessTimeline';
@@ -20,6 +21,7 @@ export default function App() {
           <span>Decision intelligence</span>
           <span>Agent architecture</span>
         </section>
+        <AboutUs />
         <Capabilities />
         <DemoCases />
         <ProcessTimeline />
