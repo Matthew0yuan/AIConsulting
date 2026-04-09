@@ -13,7 +13,7 @@ export default function Hero() {
           Build the systems layer for your next era of growth.
         </h1>
         <p className="hero-text" style={{ maxWidth: '42rem', marginBottom: '2.5rem' }}>
-          Fluxcore AI helps ambitious companies design practical AI
+          Velix AI helps ambitious companies design practical AI
           workflows, automation programs, and decision systems that feel
           advanced without becoming fragile.
         </p>

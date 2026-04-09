@@ -10,7 +10,7 @@ This file explains the purpose of each function, content block, and styling area
 
 ## `App.jsx` overview
 
-`App.jsx` is a single React component file with two responsibilities:
+`App.jsx` is the page composition entry with two responsibilities:
 
 1. Store the page content in reusable arrays
 2. Render the landing page sections using that content

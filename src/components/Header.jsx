@@ -2,9 +2,9 @@ export default function Header() {
   return (
     <header className="topbar">
       <div className="brand-lockup">
-        <a href="/" className="brand-mark" aria-label="Home">F</a>
+        <a href="/" className="brand-mark" aria-label="Home">V</a>
         <div>
-          <p className="brand-name">Fluxcore AI</p>
+          <p className="brand-name">Velix AI</p>
           <p className="brand-tag">Consulting for high-velocity teams</p>
         </div>
       </div>

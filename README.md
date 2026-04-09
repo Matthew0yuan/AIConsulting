@@ -1,6 +1,6 @@
-# Fluxcore AI
+# Velix AI
 
-React + Vite landing page for `Fluxcore AI`, an AI consulting company website with a tech-style hero, animated visuals, and demo case studies.
+React + Vite landing page for `Velix AI`, an AI consulting company website with a tech-style hero, animated visuals, and demo case studies.
 
 ## Stack
 
