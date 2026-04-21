@@ -1,4 +1,4 @@
-# Velix AI
+# Velix AI(A demo frontend project)
 A demo frontend project
 React + Vite landing page for `Velix AI`, an AI consulting company website with a tech-style hero, animated visuals, and demo case studies.
 
