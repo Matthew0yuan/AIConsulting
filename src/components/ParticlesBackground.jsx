@@ -13,11 +13,11 @@ export default function ParticlesBackground() {
     const getConfig = () => {
       const w = window.innerWidth;
       if (w >= 1200) {
-        return { cell: 40, bubbleR: 500, revealR: 560 };
+        return { cell: 50, bubbleR: 400, revealR: 600 };
       } else if (w >= 720) {
-        return { cell: 34, bubbleR: 300, revealR: 420 };
+        return { cell: 34, bubbleR: 250, revealR: 420 };
       } else {
-        return { cell: 28, bubbleR: 200, revealR: 280 };
+        return { cell: 28, bubbleR: 180, revealR: 280 };
       }
     };
 
@@ -215,7 +215,9 @@ export default function ParticlesBackground() {
               // A line with length 0 and a rounded cap draws as a perfect circular dot!
               targetLen = lerp(3.5, 0.0, 1 - fo);
               targetWid = lerp(3.8, 1.5, 1 - fo);
-              targetScale = fo * 0.45;
+              // Use a quadratic curve (fo * fo) so the opacity fades out very smoothly 
+              // and gracefully into the distance
+              targetScale = fo * fo * 0.50;
             }
           }
         }
