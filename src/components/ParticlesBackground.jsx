@@ -15,9 +15,9 @@ export default function ParticlesBackground() {
       if (w >= 1200) {
         return { cell: 50, bubbleR: 400, revealR: 600 };
       } else if (w >= 720) {
-        return { cell: 34, bubbleR: 250, revealR: 420 };
+        return { cell: 40, bubbleR: 250, revealR: 420 };
       } else {
-        return { cell: 28, bubbleR: 180, revealR: 280 };
+        return { cell: 30, bubbleR: 180, revealR: 280 };
       }
     };
 
@@ -166,8 +166,8 @@ export default function ParticlesBackground() {
           + Math.cos(d.x * FLOW_FREQ2 + t * FLOW_SPEED2 + d.seedB) * (FLOW_AMP * 0.6);
 
         // Effective position = home + fluid drift
-        const px = d.x + flowX;
-        const py = d.y + flowY;
+        let px = d.x + flowX;
+        let py = d.y + flowY;
 
         let targetScale = 0;
         let targetAngle = d.angle;
@@ -180,8 +180,21 @@ export default function ParticlesBackground() {
           const dist = Math.sqrt(dx * dx + dy * dy);
           const radialAngle = Math.atan2(dy, dx);
 
+          // ── GRAVITY WELL EFFECT ──
+          // Physically pull the particles towards the cursor
+          const gravityRadius = revealR * 1.2;
+          if (dist < gravityRadius) {
+            // Exponential pull: stronger the closer it gets
+            let pullForce = Math.pow(Math.max(0, 1 - dist / gravityRadius), 2) * 70;
+            // Limit how far a particle can physically travel from its home grid point
+            pullForce = Math.min(pullForce, 45);
+
+            px += Math.cos(radialAngle) * pullForce;
+            py += Math.sin(radialAngle) * pullForce;
+          }
+
           // Fluid edge: amoeba-like bubble boundary
-          const fluidAmp = bubbleR * 0.25;
+          const fluidAmp = bubbleR * 0.05;
           const dynamicBubbleR = bubbleR
             + Math.sin(radialAngle * 3 + t * 0.9) * fluidAmp
             + Math.sin(radialAngle * 5 - t * 0.6) * (fluidAmp * 0.8);
@@ -193,31 +206,36 @@ export default function ParticlesBackground() {
             const nd = dist / dynamicBubbleR;
 
             if (dist < dynamicBubbleR) {
-              // TWO-ZONE GEOMETRY
-              if (nd < 0.5) {
-                // Core: tiny dots
-                const zoneT = nd / 0.5;
-                targetLen = lerp(0.5, 3.0, smoothstep(zoneT));
-                targetWid = lerp(0.8, 1.4, zoneT);
-                targetScale = lerp(0.04, 0.50, smoothstep(zoneT));
+              if (nd < 0.45) {
+                // Zone 1: Inner (Small dot)
+                targetLen = 0.5;
+                targetWid = 1.2;
+                targetScale = 0.45;
+              } else if (nd < 0.85) {
+                // Zone 2: Middle ring (Vector dash) - Now significantly larger!
+                // Ramps up from dot to thick dash
+                const zoneT = (nd - 0.45) / 0.40;
+                const edgeT = smoothstep(zoneT);
+                targetLen = lerp(0.5, 4.5, edgeT);
+                targetWid = lerp(1.2, 3.5, edgeT);
+                targetScale = lerp(0.45, 1.0, edgeT);
               } else {
-                // Edge: short thick dashes
-                const zoneT = (nd - 0.5) / 0.5;
-                targetLen = lerp(3.0, 4.0, zoneT);
-                targetWid = lerp(1.0, 1.8, smoothstep(zoneT));
-                targetScale = lerp(0.50, 0.60, zoneT);
+                // Zone 3: Outer edge of bubble (Back to small dot)
+                // Shrinks back down quickly on the final 15% of the bubble edge
+                const zoneT = (nd - 0.85) / 0.15;
+                const edgeT = smoothstep(zoneT);
+                targetLen = lerp(4.5, 0.5, edgeT);
+                targetWid = lerp(2.5, 1.2, edgeT);
+                targetScale = lerp(0.90, 0.45, edgeT);
               }
             } else {
-              // Fade-out beyond bubble
+              // Zone 4: Outside bubble (Disappear)
+              // Remains a small dot, but fades out to nothing
               const falloff = 1 - (dist - dynamicBubbleR) / (revealR - dynamicBubbleR);
               const fo = Math.max(0, falloff);
-              // As 'fo' goes from 1 to 0 (moving towards outer edge), length shrinks to 0.
-              // A line with length 0 and a rounded cap draws as a perfect circular dot!
-              targetLen = lerp(3.5, 0.0, 1 - fo);
-              targetWid = lerp(3.8, 1.5, 1 - fo);
-              // Use a quadratic curve (fo * fo) so the opacity fades out very smoothly 
-              // and gracefully into the distance
-              targetScale = fo * fo * 0.50;
+              targetLen = 0.5;
+              targetWid = 1.2;
+              targetScale = 0.45 * fo; // Fade opacity to 0
             }
           }
         }
