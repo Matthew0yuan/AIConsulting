@@ -23,7 +23,7 @@ export default function ParticlesBackground() {
 
     let CFG = getConfig();
 
-    // Brand colors
+    // Brand colors (Original)
     const COLOR_TEAL = [118, 247, 191];
     const COLOR_CYAN = [127, 217, 255];
     const COLOR_BLUE = [78, 161, 255];
@@ -42,14 +42,20 @@ export default function ParticlesBackground() {
     const FLOW_SPEED2 = 0.25;   // second layer speed
 
     /* ── MOUSE STATE ───────────────────────────── */
+    const actualMouse = { x: -1000, y: -1000 };
     const mouse = { x: -1000, y: -1000 };
     let hasMouse = false;
     let lastMoveTime = 0;
     let currentIdleFactor = 0;
 
     const onMove = (e) => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
+      actualMouse.x = e.clientX;
+      actualMouse.y = e.clientY;
+      if (!hasMouse) {
+        // Snap instantly the very first time they touch the canvas
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+      }
       hasMouse = true;
       lastMoveTime = performance.now();
     };
@@ -63,15 +69,21 @@ export default function ParticlesBackground() {
 
     const buildGrid = () => {
       CFG = getConfig();
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      const dpr = window.devicePixelRatio || 1;
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width = w + 'px';
+      canvas.style.height = h + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
       const oldDots = dots;
       dots = [];
-      const cols = Math.ceil(canvas.width / CFG.cell) + 1;
-      const rows = Math.ceil(canvas.height / CFG.cell) + 1;
-      const offsetX = (canvas.width - (cols - 1) * CFG.cell) / 2;
-      const offsetY = (canvas.height - (rows - 1) * CFG.cell) / 2;
+      const cols = Math.ceil(w / CFG.cell) + 1;
+      const rows = Math.ceil(h / CFG.cell) + 1;
+      const offsetX = (w - (cols - 1) * CFG.cell) / 2;
+      const offsetY = (h - (rows - 1) * CFG.cell) / 2;
 
       let idx = 0;
       for (let r = 0; r < rows; r++) {
@@ -96,7 +108,14 @@ export default function ParticlesBackground() {
     };
 
     buildGrid();
-    window.addEventListener('resize', buildGrid);
+
+    // Debounce resize to avoid excessive grid rebuilds and GC pressure
+    let resizeTimer;
+    const onResize = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(buildGrid, 150);
+    };
+    window.addEventListener('resize', onResize);
 
     /* ── HELPERS ──────────────────────────────── */
     const lerp = (a, b, t) => a + (b - a) * t;
@@ -107,20 +126,34 @@ export default function ParticlesBackground() {
       a[2] + (b[2] - a[2]) * t,
     ];
 
-    const angleDiff = (from, to) => {
-      let d = to - from;
-      while (d > Math.PI) d -= Math.PI * 2;
-      while (d < -Math.PI) d += Math.PI * 2;
-      return d;
-    };
+    const angleDiff = (from, to) => Math.atan2(Math.sin(to - from), Math.cos(to - from));
 
     const smoothstep = (x) => x * x * (3 - 2 * x);
 
     /* ── RENDER ──────────────────────────────────── */
     const render = (time) => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
       const t = time * 0.001;
       const now = performance.now();
+
+      if (hasMouse) {
+        // ── RUBBER-BANDING LAG DELAY ──
+        const dxMatch = actualMouse.x - mouse.x;
+        const dyMatch = actualMouse.y - mouse.y;
+        const distFromMouse = Math.sqrt(dxMatch * dxMatch + dyMatch * dyMatch);
+
+        // Base trail speed (very lazy and smooth)
+        let lagFactor = 0.02; // Reduced from 0.04
+
+        // If the bubble falls more than 30 pixels behind, exponentially increase speed to rubber-band it forward!
+        if (distFromMouse > 30) {
+          // Maxes out at 0.20 (slower catch-up) and accelerates much more gently (0.001)
+          lagFactor = Math.min(0.20, 0.02 + (distFromMouse - 30) * 0.001);
+        }
+
+        mouse.x += dxMatch * lagFactor;
+        mouse.y += dyMatch * lagFactor;
+      }
 
       // Target idle factor based on time since moved
       const timeSinceMove = now - lastMoveTime;
@@ -180,18 +213,21 @@ export default function ParticlesBackground() {
           const dist = Math.sqrt(dx * dx + dy * dy);
           const radialAngle = Math.atan2(dy, dx);
 
-          // ── GRAVITY WELL EFFECT ──
-          // Physically pull the particles towards the cursor
-          const gravityRadius = revealR * 1.2;
-          if (dist < gravityRadius) {
-            // Exponential pull: stronger the closer it gets
-            let pullForce = Math.pow(Math.max(0, 1 - dist / gravityRadius), 2) * 70;
-            // Limit how far a particle can physically travel from its home grid point
-            pullForce = Math.min(pullForce, 45);
-
-            px += Math.cos(radialAngle) * pullForce;
-            py += Math.sin(radialAngle) * pullForce;
+          // ── REPULSION WAVE EFFECT ──
+          // Push each particle toward the wall distance so they all pile up
+          const wallDist = bubbleR * 1.05;
+          if (dist < wallDist) {
+            // Push 45% of the way to the wall → visible compression without collapsing
+            const pushAmount = (wallDist - dist) * 0.4;
+            px -= Math.cos(radialAngle) * pushAmount;
+            py -= Math.sin(radialAngle) * pushAmount;
           }
+
+          // Recalculate distance & angle after repulsion
+          const dx2 = mx - px;
+          const dy2 = my - py;
+          const newDist = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+          const newRadialAngle = Math.atan2(dy2, dx2);
 
           // Fluid edge: amoeba-like bubble boundary
           const fluidAmp = bubbleR * 0.05;
@@ -199,43 +235,42 @@ export default function ParticlesBackground() {
             + Math.sin(radialAngle * 3 + t * 0.9) * fluidAmp
             + Math.sin(radialAngle * 5 - t * 0.6) * (fluidAmp * 0.8);
 
+          // Use ORIGINAL distance for zone shapes (not post-repulsion)
+          // With repulsion, inner particles land at outer ring → dot-dash-dot from cursor outward
           if (dist < revealR) {
             const wobble = Math.sin(t * 1.4 + d.seed) * 0.10;
-            targetAngle = radialAngle + wobble;
+            targetAngle = newRadialAngle + wobble;
 
             const nd = dist / dynamicBubbleR;
 
             if (dist < dynamicBubbleR) {
               if (nd < 0.45) {
-                // Zone 1: Inner (Small dot)
+                // Zone 1: Originally inner → pushed to outer ring → small dots
                 targetLen = 0.5;
                 targetWid = 1.2;
                 targetScale = 0.45;
               } else if (nd < 0.85) {
-                // Zone 2: Middle ring (Vector dash) - Now significantly larger!
-                // Ramps up from dot to thick dash
+                // Zone 2: Middle ring → dashes
                 const zoneT = (nd - 0.45) / 0.40;
                 const edgeT = smoothstep(zoneT);
                 targetLen = lerp(0.5, 4.5, edgeT);
                 targetWid = lerp(1.2, 3.5, edgeT);
                 targetScale = lerp(0.45, 1.0, edgeT);
               } else {
-                // Zone 3: Outer edge of bubble (Back to small dot)
-                // Shrinks back down quickly on the final 15% of the bubble edge
+                // Zone 3: Originally outer → barely pushed → closest to cursor → tiny dots
                 const zoneT = (nd - 0.85) / 0.15;
                 const edgeT = smoothstep(zoneT);
-                targetLen = lerp(4.5, 0.5, edgeT);
-                targetWid = lerp(2.5, 1.2, edgeT);
+                targetLen = lerp(4.5, 0, edgeT);
+                targetWid = lerp(2.5, 0.6, edgeT);
                 targetScale = lerp(0.90, 0.45, edgeT);
               }
             } else {
-              // Zone 4: Outside bubble (Disappear)
-              // Remains a small dot, but fades out to nothing
+              // Zone 4: Outside bubble
               const falloff = 1 - (dist - dynamicBubbleR) / (revealR - dynamicBubbleR);
               const fo = Math.max(0, falloff);
-              targetLen = 0.5;
-              targetWid = 1.2;
-              targetScale = 0.45 * fo; // Fade opacity to 0
+              targetLen = 0;
+              targetWid = 0.6;
+              targetScale = lerp(0.08, 0.45, fo);
             }
           }
         }
@@ -243,12 +278,27 @@ export default function ParticlesBackground() {
         // Ambient background drift
         const wavePhase = (px * 0.0018) + (py * 0.0018) - t * 0.4;
         const wave = (Math.sin(wavePhase + d.seed) + 1) / 2;
-        const ambientScale = wave * 0.05;
+        let ambientScale = wave * 0.05;
+
+        // Reuse post-repulsion distance instead of recalculating
+        if (hasMouse) {
+          const adx = mx - px;
+          const ady = my - py;
+          const aDist2 = adx * adx + ady * ady; // squared dist — no sqrt needed!
+          const revealR2 = revealR * revealR;
+          if (aDist2 < revealR2) {
+            ambientScale = 0;
+          } else {
+            const aDist = Math.sqrt(aDist2);
+            const ambientT = Math.min(1, (aDist - revealR) / 100);
+            ambientScale *= ambientT;
+          }
+        }
 
         if (ambientScale > targetScale) {
           targetScale = ambientScale;
-          targetLen = 1.5;
-          targetWid = 0.8;
+          targetLen = 0.5;
+          targetWid = 1.2;
         }
 
         if (!hasMouse || targetScale < 0.08) {
@@ -267,17 +317,24 @@ export default function ParticlesBackground() {
         /* ── DISTANCE-BASED COLOR ──────────────── */
         let cr, cg, cb;
         if (hasMouse) {
-          const ddx = mx - px;
-          const ddy = my - py;
-          const dist2 = Math.sqrt(ddx * ddx + ddy * ddy);
-          const colorT = Math.min(1, dist2 / bubbleR);
+          // Reuse dx/dy from repulsion block instead of recalculating
+          const cdx = mx - px;
+          const cdy = my - py;
+          const colorDist2 = cdx * cdx + cdy * cdy;
+          const colorT = Math.min(1, Math.sqrt(colorDist2) / bubbleR);
           if (colorT < 0.5) {
-            [cr, cg, cb] = lerpColor(COLOR_TEAL, COLOR_CYAN, colorT * 2);
+            const t2 = colorT * 2;
+            cr = COLOR_TEAL[0] + (COLOR_CYAN[0] - COLOR_TEAL[0]) * t2;
+            cg = COLOR_TEAL[1] + (COLOR_CYAN[1] - COLOR_TEAL[1]) * t2;
+            cb = COLOR_TEAL[2] + (COLOR_CYAN[2] - COLOR_TEAL[2]) * t2;
           } else {
-            [cr, cg, cb] = lerpColor(COLOR_CYAN, COLOR_BLUE, (colorT - 0.5) * 2);
+            const t2 = (colorT - 0.5) * 2;
+            cr = COLOR_CYAN[0] + (COLOR_BLUE[0] - COLOR_CYAN[0]) * t2;
+            cg = COLOR_CYAN[1] + (COLOR_BLUE[1] - COLOR_CYAN[1]) * t2;
+            cb = COLOR_CYAN[2] + (COLOR_BLUE[2] - COLOR_CYAN[2]) * t2;
           }
         } else {
-          [cr, cg, cb] = COLOR_BLUE;
+          cr = COLOR_BLUE[0]; cg = COLOR_BLUE[1]; cb = COLOR_BLUE[2];
         }
 
         const alpha = Math.min(1, d.scale * 1.5);
@@ -287,7 +344,7 @@ export default function ParticlesBackground() {
         const cosA = Math.cos(d.angle);
         const sinA = Math.sin(d.angle);
 
-        ctx.strokeStyle = `rgba(${Math.round(cr)},${Math.round(cg)},${Math.round(cb)},${alpha.toFixed(3)})`;
+        ctx.strokeStyle = `rgba(${cr + 0.5 | 0},${cg + 0.5 | 0},${cb + 0.5 | 0},${alpha.toFixed(3)})`;
         ctx.lineWidth = Math.max(0.5, d.aWid);
 
         ctx.beginPath();
@@ -302,7 +359,8 @@ export default function ParticlesBackground() {
     animationFrameId = requestAnimationFrame(render);
 
     return () => {
-      window.removeEventListener('resize', buildGrid);
+      window.removeEventListener('resize', onResize);
+      clearTimeout(resizeTimer);
       window.removeEventListener('mousemove', onMove);
       window.removeEventListener('mouseout', onOut);
       cancelAnimationFrame(animationFrameId);
