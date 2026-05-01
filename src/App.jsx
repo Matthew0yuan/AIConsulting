@@ -6,6 +6,9 @@ import DemoCases from './components/DemoCases';
 import ProcessTimeline from './components/ProcessTimeline';
 import ContactPanel from './components/ContactPanel';
 import ParticlesBackground from './components/ParticlesBackground';
+import Reveal from './components/Reveal';
+import MetricsRow from './components/MetricsRow';
+import Footer from './components/Footer';
 
 export default function App() {
   return (
@@ -13,20 +16,32 @@ export default function App() {
       <ParticlesBackground />
       <Header />
       <main>
-        <Hero />
-        <section className="logo-band" aria-label="Positioning highlights" style={{ justifyContent: 'center' }}>
-          <span>AI transformation</span>
-          <span>Workflow redesign</span>
-          <span>Revenue systems</span>
-          <span>Decision intelligence</span>
-          <span>Agent architecture</span>
-        </section>
+        <Reveal delay={0}>
+          <Hero />
+        </Reveal>
+        <Reveal delay={150}>
+          <section className="logo-band" aria-label="Positioning highlights" style={{ justifyContent: 'center' }}>
+            <span>AI transformation</span>
+            <span style={{ color: 'var(--teal)' }}>•</span>
+            <span>Workflow redesign</span>
+            <span style={{ color: 'var(--teal)' }}>•</span>
+            <span>Revenue systems</span>
+            <span style={{ color: 'var(--teal)' }}>•</span>
+            <span>Decision intelligence</span>
+            <span style={{ color: 'var(--teal)' }}>•</span>
+            <span>Agent architecture</span>
+          </section>
+        </Reveal>
         <AboutUs />
+        <MetricsRow />
         <Capabilities />
         <DemoCases />
         <ProcessTimeline />
-        <ContactPanel />
+        <Reveal delay={0}>
+          <ContactPanel />
+        </Reveal>
       </main>
+      <Footer />
     </div>
   );
 }

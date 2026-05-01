@@ -1,23 +1,17 @@
 export default function Hero() {
   return (
-    <section className="hero" style={{ 
-      display: 'flex', 
-      flexDirection: 'column', 
-      alignItems: 'center', 
-      textAlign: 'center', 
-      padding: '8rem 0 4rem' 
-    }}>
-      <div className="hero-copy" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <section className="hero">
+      <div className="hero-copy">
         <p className="eyebrow">AI CONSULTING STUDIO</p>
-        <h1 style={{ maxWidth: '20ch', marginBottom: '1.5rem', fontSize: 'clamp(3rem, 9vw, 5rem)' }}>
+        <h1>
           Build the systems layer for your next era of growth.
         </h1>
-        <p className="hero-text" style={{ maxWidth: '42rem', marginBottom: '2.5rem' }}>
+        <p className="hero-text">
           Velix AI helps ambitious companies design practical AI
           workflows, automation programs, and decision systems that feel
           advanced without becoming fragile.
         </p>
-        <div className="hero-actions" style={{ justifyContent: 'center' }}>
+        <div className="hero-actions">
           <a href="#cases" className="button button-primary">
             See demo cases
           </a>

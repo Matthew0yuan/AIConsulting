@@ -10,9 +10,9 @@ export const services = [
       'From lead routing to support copilots, we build reliable automations with human-in-the-loop controls and measurable ROI.',
   },
   {
-    title: 'Executive Dashboards',
+    title: 'Custom Knowledge Engines',
     description:
-      'We turn scattered signals into live command centers so leaders can see opportunities, bottlenecks, and next moves in real time.',
+      'We build secure, company-specific retrieval systems that let your teams instantly query internal data, past projects, and proprietary documentation.',
   },
 ];
 
@@ -24,25 +24,25 @@ export const metrics = [
 
 export const cases = [
   {
-    name: 'Atlas Health',
-    category: 'Intake automation',
+    name: 'Perth Car Rental Fleet',
+    category: 'Booking Automation',
     summary:
-      'Rebuilt patient intake with AI triage and internal routing, cutting admin overload while keeping human review where it mattered.',
-    outcome: '67% faster intake review',
+      'Automated vehicle allocation and return processing by integrating reservation platforms with internal fleet management systems.',
+    outcome: '10 hours saved weekly',
   },
   {
-    name: 'Northstar Capital',
-    category: 'Analyst copilot',
+    name: 'WA Accounting Practice',
+    category: 'Report Generation',
     summary:
-      'Created a research workflow that condensed filings, surfaced anomalies, and packaged investment memos for partner review.',
-    outcome: '18 hours saved per analyst each week',
+      'Eliminated manual data entry by orchestrating a document pipeline that automatically routes and structures client tax records.',
+    outcome: '160+ hours saved monthly',
   },
   {
-    name: 'PulseGrid Logistics',
-    category: 'Forecast intelligence',
+    name: 'Perth Retail Group',
+    category: 'Inventory Reconciliation',
     summary:
-      'Linked demand data, shipment risk, and supplier alerts into one predictive cockpit for operations and sales teams.',
-    outcome: '29% fewer stockout events',
+      'Connected point-of-sale data with warehouse systems through a unified dashboard, eliminating manual end-of-month spreadsheet reconciliation.',
+    outcome: '200+ hours saved monthly',
   },
 ];
 
