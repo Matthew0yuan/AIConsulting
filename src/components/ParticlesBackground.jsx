@@ -30,36 +30,34 @@ export default function ParticlesBackground() {
 
     // Easing
     const EASE_IN = 0.06;
-    const EASE_OUT = 0.04;
+    const EASE_OUT = 0.03
     const EASE_ANGLE = 0.10;
 
     // ── FLUID FLOW NOISE ──────────────────────────
     // Layered sine waves give each dot a smooth, organic drift
     const FLOW_AMP = 6;     // max px drift from home position
     const FLOW_FREQ = 0.002;  // very low = huge swirl regions (groups move together)
-    const FLOW_FREQ2 = 0.0003;  // second layer, also low for coherent motion
+    const FLOW_FREQ2 = 0.003;  // second layer, also low for coherent motion
     const FLOW_SPEED = 0.4;    // temporal speed
     const FLOW_SPEED2 = 0.25;   // second layer speed
 
     /* ── MOUSE STATE ───────────────────────────── */
-    const actualMouse = { x: -1000, y: -1000 };
-    const mouse = { x: -1000, y: -1000 };
-    let hasMouse = false;
+    const actualMouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    const mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    let hasMouse = true;
     let lastMoveTime = 0;
-    let currentIdleFactor = 0;
+    let currentIdleFactor = 1;
 
     const onMove = (e) => {
       actualMouse.x = e.clientX;
       actualMouse.y = e.clientY;
-      if (!hasMouse) {
-        // Snap instantly the very first time they touch the canvas
-        mouse.x = e.clientX;
-        mouse.y = e.clientY;
-      }
-      hasMouse = true;
       lastMoveTime = performance.now();
     };
-    const onOut = () => { hasMouse = false; };
+    const onOut = () => {
+      // Gently drift back to center when cursor leaves
+      actualMouse.x = window.innerWidth / 2;
+      actualMouse.y = window.innerHeight / 2;
+    };
 
     window.addEventListener('mousemove', onMove);
     window.addEventListener('mouseout', onOut);
@@ -143,12 +141,12 @@ export default function ParticlesBackground() {
         const distFromMouse = Math.sqrt(dxMatch * dxMatch + dyMatch * dyMatch);
 
         // Base trail speed (very lazy and smooth)
-        let lagFactor = 0.02; // Reduced from 0.04
+        let lagFactor = 0.041// Reduced from 0.04
 
         // If the bubble falls more than 30 pixels behind, exponentially increase speed to rubber-band it forward!
         if (distFromMouse > 30) {
           // Maxes out at 0.20 (slower catch-up) and accelerates much more gently (0.001)
-          lagFactor = Math.min(0.20, 0.02 + (distFromMouse - 30) * 0.001);
+          lagFactor = Math.min(0.20, 0.02 + (distFromMouse - 30) * 0.0000001);
         }
 
         mouse.x += dxMatch * lagFactor;
