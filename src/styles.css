@@ -94,6 +94,23 @@ button {
   gap: 0.85rem;
 }
 
+.brand-logo-link {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.brand-logo {
+  display: block;
+  width: clamp(8.5rem, 15vw, 11rem);
+  height: auto;
+  filter: drop-shadow(0 0 18px rgba(118, 247, 191, 0.12));
+}
+
+.brand-logo-compact {
+  width: 8rem;
+}
+
 .brand-mark {
   display: grid;
   place-items: center;
@@ -703,6 +720,14 @@ button {
   .nav-links {
     flex-wrap: wrap;
     gap: 0.8rem 1rem;
+  }
+
+  .brand-lockup {
+    align-items: flex-start;
+  }
+
+  .brand-logo {
+    width: 8.4rem;
   }
 
   .hero-copy h1 {

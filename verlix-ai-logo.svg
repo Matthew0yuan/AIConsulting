@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 180" role="img" aria-labelledby="title desc">
+  <title id="title">verlix AI logo</title>
+  <desc id="desc">A simple vector logo with a floating anti-gravity mark and verlix AI wordmark.</desc>
+  <defs>
+    <linearGradient id="verlixLift" x1="58" x2="138" y1="42" y2="136" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#78F5C8" />
+      <stop offset="1" stop-color="#4FA7FF" />
+    </linearGradient>
+  </defs>
+
+  <g fill="none" fill-rule="evenodd">
+    <g transform="translate(34 22)">
+      <path
+        d="M28 42c22-18 72-18 94 0"
+        stroke="#8FF6D2"
+        stroke-linecap="round"
+        stroke-width="6"
+        opacity=".82"
+        transform="rotate(-10 75 42)"
+      />
+      <circle cx="75" cy="31" r="10" fill="#8FF6D2" />
+      <path
+        d="M20 56h22l33 56 33-56h22L88 128H62L20 56Z"
+        fill="url(#verlixLift)"
+      />
+      <path
+        d="M75 54v61"
+        stroke="#07111F"
+        stroke-linecap="round"
+        stroke-width="8"
+        opacity=".75"
+      />
+    </g>
+
+    <g fill="#07111F" transform="translate(188 50)">
+      <text
+        x="0"
+        y="70"
+        font-family="Inter, Avenir Next, Segoe UI, Arial, sans-serif"
+        font-size="72"
+        font-weight="700"
+        letter-spacing="0"
+      >verlix</text>
+      <text
+        x="260"
+        y="70"
+        font-family="Inter, Avenir Next, Segoe UI, Arial, sans-serif"
+        font-size="36"
+        font-weight="700"
+        letter-spacing="4"
+      >AI</text>
+    </g>
+  </g>
+</svg>

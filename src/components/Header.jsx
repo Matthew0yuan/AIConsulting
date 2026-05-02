@@ -1,10 +1,13 @@
+import BrandLogo from './BrandLogo';
+
 export default function Header() {
   return (
     <header className="topbar">
       <div className="brand-lockup">
-        <a href="/" className="brand-mark" aria-label="Home">V</a>
+        <a href="/" className="brand-logo-link" aria-label="Verlix AI home">
+          <BrandLogo />
+        </a>
         <div>
-          <p className="brand-name">Velix AI</p>
           <p className="brand-tag">Consulting for high-velocity teams</p>
         </div>
       </div>

@@ -6,8 +6,8 @@ export default function ContactPanel() {
         <h2>Bring us the messy process. We&apos;ll turn it into a clear AI system.</h2>
       </div>
       <div className="cta-actions">
-        <a href="mailto:hello@velix.ai" className="button button-primary">
-          hello@velix.ai
+        <a href="mailto:hello@verlix.ai" className="button button-primary">
+          hello@verlix.ai
         </a>
         <p>
           Strategy sprints, pilot builds, and executive advisory for teams

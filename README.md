@@ -1,9 +1,9 @@
-# Velix AI(A demo frontend project)
+# Verlix AI(A demo frontend project)
 This is a demo frontend project
 
 https://verlixai.com/
 
-React + Vite landing page for `Velix AI`, an AI consulting company website with a tech-style hero, animated visuals, and demo case studies.
+React + Vite landing page for `Verlix AI`, an AI consulting company website with a tech-style hero, animated visuals, and demo case studies.
 
 ## Stack
 
